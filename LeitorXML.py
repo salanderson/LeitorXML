@@ -12,8 +12,11 @@ def extrair_dados_xml(caminho_arquivo):
         
         ns = {'nfe': 'http://www.portalfiscal.inf.br/nfe'}
 
-        tree = ET.parse(caminho_arquivo)
-        root = tree.getroot()
+        arquivos_xml = [f for f in os.listdir('.')if f.lower().endswith('.xml')]
+
+        for caminho_arquivo in arquivos_xml:
+            tree = ET.parse(caminho_arquivo)
+            root = tree.getroot()
 
         emit = root.find('.//nfe:emit', ns)
         if emit is None:
@@ -91,7 +94,7 @@ def listar_dados_simplificados():
     texto_resultado.delete('1.0', tk.END)
     
     if not dados_xmls:
-        texto_resultado.insert(tk.END, 'Nenhum dado disponivel, Importe os XMLs primeiro. \n')    
+        texto_resultado.insert(tk.END, 'Nenhum dados disponivel, Importe os XMLs primeiro. \n')    
         return
     
     dados_emitente = dados_xmls[0]
@@ -120,7 +123,7 @@ def mostrar_ultima_nota():
     texto_resultado.delete('1.0', tk.END)
     
     if not dados_xmls:
-        texto_resultado.insert(tk.END, 'Nenhum dado disponivel. Importe os XMLs primeiro. \n')
+        texto_resultado.insert(tk.END, 'Nenhum dados disponivel. Importe os XMLs primeiro. \n')
         return
     
     modelos = {}
