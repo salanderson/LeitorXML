@@ -1,0 +1,99 @@
+Documentação Técnica — Leitor de XML de NF-e
+🧩 Visão Geral
+Este programa é uma aplicação desktop desenvolvida com Python e Tkinter que permite importar, visualizar e analisar arquivos XML de Notas Fiscais Eletrônicas (NF-e). Ele extrai dados relevantes dos arquivos e oferece funcionalidades para inspeção simplificada, verificação de sequência numérica e identificação da última nota emitida.
+
+🖥️ Tecnologias Utilizadas
+Python 3
+
+Tkinter: Interface gráfica
+
+xml.etree.ElementTree: Leitura e parsing de arquivos XML
+
+os: Manipulação de arquivos e diretórios
+
+📂 Funcionalidades Principais
+1. Importar XMLs
+Função: importar_xmls()
+
+Abre um diálogo para o usuário selecionar uma pasta.
+
+Lê todos os arquivos .xml da pasta.
+
+Extrai dados relevantes de cada nota fiscal:
+
+CNPJ, Nome, Fantasia
+
+Modelo, Série, Número da Nota
+
+Data de Emissão e Saída/Entrada
+
+Exibe os dados na interface e atualiza a barra de progresso.
+
+2. Listar Dados Simplificados
+Função: listar_dados_simplificados()
+
+Exibe os dados do emitente (CNPJ, Nome, Fantasia).
+
+Lista todas as notas fiscais importadas com:
+
+Número, Série, Modelo e Data de Emissão.
+
+3. Mostrar Última Nota Emitida
+Função: mostrar_ultima_nota()
+
+Agrupa as notas por modelo.
+
+Identifica a nota com maior número (nNF) dentro de cada modelo.
+
+Exibe os dados completos da última nota:
+
+Número, Série, Data, CNPJ, Nome, Fantasia.
+
+4. Verificar Sequência Numérica
+Função: verificar_sequencia_numerica()
+
+Agrupa notas por modelo e série.
+
+Ordena os números de nota (nNF) de cada grupo.
+
+Verifica se há lacunas na sequência.
+
+Exibe os números faltantes ou informa que a sequência está completa.
+
+🧠 Lógica de Extração XML
+Função: extrair_dados_xml(caminho_arquivo)
+
+Utiliza o namespace padrão da NF-e.
+
+Localiza os elementos <emit> e <ide> no XML.
+
+Extrai os campos desejados com findtext.
+
+Retorna um dicionário com os dados ou None em caso de erro.
+
+🧾 Interface Gráfica
+Botões:
+
+Importar XML: Executa a importação dos arquivos.
+
+Listar XML: Exibe os dados simplificados.
+
+Notas Faltantes: Verifica lacunas na sequência.
+
+Última Nota Emitida: Mostra a nota mais recente.
+
+Área de Texto: Exibe os resultados das operações.
+
+Barra de Progresso: Indica o andamento da importação.
+
+Rodapé: Mostra o nome do desenvolvedor.
+
+📌 Observações Técnicas
+O programa ignora arquivos XML que não contenham os campos obrigatórios.
+
+A verificação de sequência numérica considera apenas números válidos (inteiros).
+
+A extração é feita diretamente do XML sem dependência de bibliotecas externas além da padrão.
+
+👤 Autor
+Desenvolvido por: Anderson Saldanha Tecnologia: Python + Tkinter Finalidade: Leitura e análise de NF-e em XML para controle e auditoria.
