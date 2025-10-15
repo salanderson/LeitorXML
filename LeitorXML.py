@@ -6,6 +6,9 @@ from tkinter import ttk  # Componentes visuais como barra de progresso
 from tkinter.scrolledtext import ScrolledText  # Área de texto com rolagem
 import os  # Operações com o sistema de arquivos
 
+
+
+
 # Função para extrair dados de um arquivo XML
 def extrair_dados_xml(caminho_arquivo):
     try:
@@ -52,19 +55,29 @@ def extrair_dados_xml(caminho_arquivo):
 # Lista que armazenará os dados extraídos dos XMLs
 dados_xmls = []
 
+def selecionar_varias_pastas():
+    pastas = []
+    while True:
+        pasta = filedialog.askdirectory(title='Selecionar uma pasta com XMLs (Cancelar para encerrar) ')
+        if not pasta:
+            break
+        pastas.append(pasta)
+    return pastas
 # Função para importar os arquivos XML de uma pasta
 def importar_xmls():
     global dados_xmls
     dados_xmls = []
 
     # Abre diálogo para seleção de pasta
-    pasta = filedialog.askdirectory(title='Selecione a pasta com XMLs')
-    if not pasta:
+    pastas = selecionar_varias_pastas()
+    if not pastas:
         return
-
-    # Filtra os arquivos XML na pasta selecionada
-    arquivos = [f for f in os.listdir(pasta) if f.lower().endswith('.xml')]
+    
     texto_resultado.delete('1.0', tk.END)
+    arquivos = []
+
+    for pasta in pastas:
+        arquivos += [os.path.join(pasta, f) for f in os.listdir(pasta) if f.lower().endswith('.xml')]
 
     if not arquivos:
         texto_resultado.insert(tk.END, 'Nenhum arquivo XML encontrado. \n')
@@ -75,8 +88,8 @@ def importar_xmls():
 
     # Processa cada arquivo XML
     for i, arquivo in enumerate(arquivos, start=1):
-        caminho = os.path.join(pasta, arquivo)
-        dados = extrair_dados_xml(caminho)
+        caminho = os.path.basename(arquivo)
+        dados = extrair_dados_xml(arquivo)
 
         texto_resultado.insert(tk.END, f'Arquivo: {arquivo}\n')
         if dados is not None:
