@@ -121,6 +121,8 @@ def listar_dados_simplificados():
         modelo = dados.get('mod', 'Desconhecido')
         texto_resultado.insert(tk.END, f"{i}. Numero: {dados['nNF']} | Serie: {dados['serie']} | Modelo: {modelo} | Emissao: {dados['dhEmi']}\n")
 
+    dados_xmls.sort(key=lambda x: int(x['nNF']) if x['nNF'].isdigit() else -1)
+
 # Função para obter a última nota fiscal com número válido
 def obter_ultima_nota():
     if not dados_xmls:
