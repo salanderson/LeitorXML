@@ -61,7 +61,11 @@ def selecionar_varias_pastas():
         pasta = filedialog.askdirectory(title='Selecionar uma pasta com XMLs (Cancelar para encerrar) ')
         if not pasta:
             break
-        pastas.append(pasta)
+        if pasta not in pastas:
+            pastas.append(pasta)
+        else:
+            texto_resultado.insert(tk.END, f"Pasta ja selecionada: {pasta}\n")
+    
     return pastas
 # Função para importar os arquivos XML de uma pasta
 def importar_xmls():
@@ -77,7 +81,13 @@ def importar_xmls():
     arquivos = []
 
     for pasta in pastas:
-        arquivos += [os.path.join(pasta, f) for f in os.listdir(pasta) if f.lower().endswith('.xml')]
+        for raiz, _, arquivos_encontrados in os.walk(pasta):
+            for f in arquivos_encontrados:
+                if f.lower().endswith('.xml'):
+                    caminho_completo = os.path.join(raiz, f)
+                    arquivos.append(caminho_completo)
+
+        # arquivos += [os.path.join(pasta, f) for f in os.listdir(pasta) if f.lower().endswith('.xml')]
 
     if not arquivos:
         texto_resultado.insert(tk.END, 'Nenhum arquivo XML encontrado. \n')
@@ -88,10 +98,10 @@ def importar_xmls():
 
     # Processa cada arquivo XML
     for i, arquivo in enumerate(arquivos, start=1):
-        caminho = os.path.basename(arquivo)
+        caminho = os.path.relpath(arquivo, start=os.path.commonpath(pastas))
         dados = extrair_dados_xml(arquivo)
 
-        texto_resultado.insert(tk.END, f'Arquivo: {arquivo}\n')
+        texto_resultado.insert(tk.END, f'Arquivo: {caminho}\n')
         if dados is not None:
             dados_xmls.append(dados)
             for chave, valor in dados.items():
@@ -108,18 +118,43 @@ def importar_xmls():
 def listar_dados_simplificados():
     texto_resultado.delete('1.0', tk.END)
 
-    if not dados_xmls:
-        texto_resultado.insert(tk.END, 'Nenhum dados disponivel, Importe os XMLs primeiro. \n')
+# Filtrar os modelos selecionados
+    modelos_selecionados = []
+    if modelo_55.get():
+        modelos_selecionados.append('55')
+    if modelo_65.get():
+        modelos_selecionados.append('65')
+    
+    if not modelos_selecionados:
+        texto_resultado.insert(tk.END, 'Nenhum modelo selecionado. Marque pelo menos um modelo para listar. \n')
         return
 
-    dados_emitente = dados_xmls[0]
+# Filtrar os dados conforme os modelos selecionados
+    dados_filtrados = [d for d in dados_xmls if d.get('mod') in modelos_selecionados]    
+
+    if not dados_filtrados:
+        texto_resultado.insert(tk.END, 'Nenhum XML encontrado para os modelos selecionados.\n')
+        return
+    
+    # Ordena por numero de notas
+    dados_filtrados.sort(key=lambda x: int(x['nNF']) if x['nNF'].isdigit() else -1)
+
+    # Exibe os dados da Empresa (do primeiro XML filtrado)
+    dados_emitente = dados_filtrados[0]
     texto_resultado.insert(tk.END, f"CNPJ: {dados_emitente['cnpj']} | Nome: {dados_emitente['nome']} | Fantasia: {dados_emitente['fant']}\n")
     texto_resultado.insert(tk.END, "-" * 80 + "\n")
-
     texto_resultado.insert(tk.END, 'Lista simplificada de Notas Fiscais: \n')
-    for i, dados in enumerate(dados_xmls, start=1):
+
+    # Exibe a lista das notas
+    for i, dados in enumerate(dados_filtrados, start=1):
         modelo = dados.get('mod', 'Desconhecido')
         texto_resultado.insert(tk.END, f"{i}. Numero: {dados['nNF']} | Serie: {dados['serie']} | Modelo: {modelo} | Emissao: {dados['dhEmi']}\n")
+
+    dados_filtrados = [d for d in dados_xmls if d.get('mod') in modelos_selecionados]
+    if not dados_filtrados:
+        texto_resultado.insert(tk.END, 'Nenhum XML encontrado para os modelos selecionados.\n')
+        return
+    dados_emitente = dados_filtrados[0]
 
     dados_xmls.sort(key=lambda x: int(x['nNF']) if x['nNF'].isdigit() else -1)
 
@@ -254,7 +289,20 @@ frame_principal.pack(fill='both', expand=True)
 
 # Frame que contém os botões superiores
 frame_botoes = tk.Frame(janela)
-frame_botoes.pack(side='top', pady=10)
+frame_botoes.pack(side='top', fill='x', pady=10)
+
+# Variaveis para os checkboxes de modelo
+modelo_55 = tk.BooleanVar(value=False)
+modelo_65 = tk.BooleanVar(value=False)
+
+frame_modelos = tk.LabelFrame(frame_botoes, text='Filtrar por modelo', padx=10, pady=5)
+frame_modelos.pack(side=tk.LEFT, padx=10)
+
+checkbox_55 = tk.Checkbutton(frame_modelos, text='Modelo 55', variable= modelo_55)
+checkbox_55.pack(anchor='w')
+
+checkbox_65 = tk.Checkbutton(frame_modelos, text='Modelo 65', variable= modelo_65)
+checkbox_65.pack(anchor='w')
 
 # Frame que contém a área de texto
 frame_texto = tk.Frame(janela)
