@@ -276,6 +276,29 @@ def verificar_sequencia_numerica():
             # Caso não haja faltantes, informa que a sequência está completa
             texto_resultado.insert(tk.END, 'Sequencia completa. Nenhum numero faltando. \n')
 
+def aplicar_tema():
+    if modo_dark.get():
+        janela.configure(bg='#2e2e2e')
+        frame_principal.configure(bg='#2e2e2e')
+        frame_botoes.configure(bg='#2e2e2e')
+        frame_texto.configure(bg='#2e2e2e')
+        frame_rodape.configure(bg='#2e2e2e')
+        texto_resultado.configure(bg='#2e2e2e', fg='white', insertbackground='white')
+        label_desenvolvedor.configure(bg='#2e2e2e', fg='white')
+    elif modo_light.get():
+        janela.configure(bg='SystemButtonFace')
+        frame_principal.configure(bg='SystemButtonFace')
+        frame_botoes.configure(bg='SystemButtonFace')
+        frame_texto.configure(bg='SystemButtonFace')
+        frame_rodape.configure(bg='SystemButtonFace')
+        texto_resultado.configure(bg='white', fg='black', insertbackground='black')
+        label_desenvolvedor.configure(bg='SystemButtonFace', fg='black')
+
+        if modo_dark.get():
+            modo_light.set(False)
+        elif modo_light.get():
+            modo_dark.set(False)
+
 
 
 # Criação da janela principal da interface gráfica
@@ -290,6 +313,19 @@ frame_principal.pack(fill='both', expand=True)
 # Frame que contém os botões superiores
 frame_botoes = tk.Frame(janela)
 frame_botoes.pack(side='top', fill='x', pady=10)
+
+# Criaçao dos Temas do soft
+modo_light = tk.BooleanVar(value=False)
+modo_dark = tk.BooleanVar(value=False)
+
+frame_tema = tk.LabelFrame(frame_botoes, text="Tema", padx=10, pady=5)
+frame_tema.pack(side=tk.LEFT, padx=10)
+
+checkbox_light = tk.Checkbutton(frame_tema, text="Modo Claro", variable=modo_light, command=aplicar_tema)
+checkbox_light.pack(anchor='w')
+
+checkbox_dark = tk.Checkbutton(frame_tema, text="Modo Escuro", variable=modo_dark, command=aplicar_tema)
+checkbox_dark.pack(anchor='w')
 
 # Variaveis para os checkboxes de modelo
 modelo_55 = tk.BooleanVar(value=False)
@@ -346,7 +382,7 @@ barra_progresso = ttk.Progressbar(frame_rodape, orient='horizontal', length=650,
 barra_progresso.pack(side='top', pady=10)
 
 # Label com crédito do desenvolvedor
-label_desenvolvedor = tk.Label(frame_rodape, text='Desenvolvido por Anderson Saldanha', font=('Arial', 10), anchor='center')
+label_desenvolvedor = tk.Label(frame_rodape, text='Desenvolvido por Anderson Saldanha | Versao: 2302-16102025', font=('Arial', 10), anchor='center')
 label_desenvolvedor.pack(side='bottom', fill='x', pady=(0, 5))
 
 # Inicia o loop principal da interface gráfica
